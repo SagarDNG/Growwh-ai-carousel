@@ -16,6 +16,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ quotes });
   } catch (error) {
+    console.error("Error:", error);
     return NextResponse.json({ error: "Failed to generate quotes" }, { status: 500 });
   }
 }
