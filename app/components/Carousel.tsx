@@ -3,13 +3,17 @@ import { useEffect, useRef } from "react";
 import jsPDF from "jspdf";
 
 export default function Carousel({ quotes }: { quotes: string[] }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null); // Explicitly allow null
 
   useEffect(() => {
     if (quotes.length === 0) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    // Explicitly set canvas size
+    canvas.width = 800;
+    canvas.height = 800;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -20,21 +24,22 @@ export default function Carousel({ quotes }: { quotes: string[] }) {
     gradient.addColorStop(1, "#00f2fe"); // Cyan
 
     ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height); // Fill canvas with gradient
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Set text properties
     ctx.fillStyle = "white";
     ctx.font = "24px Arial";
     ctx.textAlign = "center";
+    ctx.textBaseline = "middle"; // Center vertically
     ctx.fillText(quotes[0], canvas.width / 2, canvas.height / 2);
   }, [quotes]);
 
   return (
     <div className="flex flex-col items-center">
-      <canvas ref={canvasRef} width={800} height={800} className="border" />
+      <canvas ref={canvasRef} className="border" />
 
       <button
-        onClick={() => canvasRef.current && downloadImage(canvasRef)}
+        onClick={() => downloadImage(canvasRef)}
         className="mt-4 px-4 py-2 bg-green-500 text-white rounded"
       >
         Download Image
@@ -50,9 +55,9 @@ export default function Carousel({ quotes }: { quotes: string[] }) {
   );
 }
 
-const downloadImage = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
+const downloadImage = (canvasRef: React.RefObject<HTMLCanvasElement | null>) => {
   const canvas = canvasRef.current;
-  if (!canvas) return;
+  if (!canvas) return; // Ensure canvas is not null
 
   const link = document.createElement("a");
   link.href = canvas.toDataURL("image/png");
@@ -62,10 +67,11 @@ const downloadImage = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
 
 const downloadPDF = (quotes: string[]) => {
   const pdf = new jsPDF();
-  
+
   quotes.forEach((quote, i) => {
-    pdf.text(20, 30 + i * 40, String(quote));
+    pdf.text(String(quote), 20, 30 + i * 40);
   });
+
 
   pdf.save("carousel.pdf");
 };
