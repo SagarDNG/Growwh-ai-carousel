@@ -17,7 +17,7 @@ export default function Home() {
     setError(null);
 
     try {
-      const response = await fetch("/api/generate-quotes", {
+      const response = await fetch("http://65.1.214.87:4000//api/generate-quotes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ theme }),
