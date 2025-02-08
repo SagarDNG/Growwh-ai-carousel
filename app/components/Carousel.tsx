@@ -16,8 +16,8 @@ export default function Carousel({ quotes }: { quotes: string[] }) {
     let yOffset = y;
 
     for (let i = 0; i < words.length; i++) {
-      let testLine = line + words[i] + " ";
-      let testWidth = ctx.measureText(testLine).width;
+      const testLine = line + words[i] + " ";
+      const testWidth = ctx.measureText(testLine).width;
 
       if (testWidth > maxWidth && i > 0) {
         ctx.fillText(line, x, yOffset);
@@ -89,12 +89,12 @@ export default function Carousel({ quotes }: { quotes: string[] }) {
 
   const splitTextIntoLines = (text: string, pdf: jsPDF, maxWidth: number) => {
     const words = text.split(" ");
-    let lines: string[] = [];
+    const lines: string[] = [];
     let line = "";
 
     words.forEach((word) => {
-      let testLine = line + word + " ";
-      let testWidth = pdf.getTextWidth(testLine);
+      const testLine = line + word + " ";
+      const testWidth = pdf.getTextWidth(testLine);
 
       if (testWidth > maxWidth) {
         lines.push(line);
@@ -119,7 +119,7 @@ export default function Carousel({ quotes }: { quotes: string[] }) {
     const maxWidth = 180; // Limit text width
     const lineHeight = 10;
 
-    quotes.forEach((quote, i) => {
+    quotes.forEach((quote) => {
       //before
       // pdf.text(quote, 20, 30 + i * 40);
 
