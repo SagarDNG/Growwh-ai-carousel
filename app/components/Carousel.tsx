@@ -9,6 +9,28 @@ export default function Carousel({ quotes }: { quotes: string[] }) {
   const [colorTheme, setColorTheme] = useState("gradient");
   const [backgroundColor, setBackgroundColor] = useState("#1e293b"); // Default: Dark Blue
 
+
+  const drawText = (ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) => {
+    const words = text.split(" ");
+    let line = "";
+    let yOffset = y;
+
+    for (let i = 0; i < words.length; i++) {
+      let testLine = line + words[i] + " ";
+      let testWidth = ctx.measureText(testLine).width;
+
+      if (testWidth > maxWidth && i > 0) {
+        ctx.fillText(line, x, yOffset);
+        line = words[i] + " ";
+        yOffset += lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
+    ctx.fillText(line, x, yOffset);
+  };
+
+
   useEffect(() => {
     if (quotes.length === 0) return;
 
@@ -43,7 +65,8 @@ export default function Carousel({ quotes }: { quotes: string[] }) {
     ctx.font = `24px ${fontStyle}`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(quotes[currentSlide], canvas.width / 2, canvas.height / 2);
+    // ctx.fillText(quotes[currentSlide], canvas.width / 2, canvas.height / 2);
+    drawText(ctx, quotes[currentSlide], canvas.width / 2, canvas.height / 3, canvas.width * 0.8, 30);
   }, [quotes, currentSlide, fontStyle, colorTheme, backgroundColor]);
 
   const nextSlide = () => {
@@ -64,13 +87,50 @@ export default function Carousel({ quotes }: { quotes: string[] }) {
     link.click();
   };
 
+  const splitTextIntoLines = (text: string, pdf: jsPDF, maxWidth: number) => {
+    const words = text.split(" ");
+    let lines: string[] = [];
+    let line = "";
+
+    words.forEach((word) => {
+      let testLine = line + word + " ";
+      let testWidth = pdf.getTextWidth(testLine);
+
+      if (testWidth > maxWidth) {
+        lines.push(line);
+        line = word + " ";
+      } else {
+        line = testLine;
+      }
+    });
+
+    lines.push(line);
+    return lines;
+  };
+
+
+
   const downloadPDF = () => {
     const pdf = new jsPDF();
     pdf.setFontSize(16);
     pdf.setFont(fontStyle);
 
+    let yPosition = 30;
+    const maxWidth = 180; // Limit text width
+    const lineHeight = 10;
+
     quotes.forEach((quote, i) => {
-      pdf.text(quote, 20, 30 + i * 40);
+      //before
+      // pdf.text(quote, 20, 30 + i * 40);
+
+      //after
+      const wrappedLines = splitTextIntoLines(quote, pdf, maxWidth);
+      wrappedLines.forEach((line) => {
+        pdf.text(line, 15, yPosition);
+        yPosition += lineHeight;
+      });
+
+      yPosition += 10; // Extra space between quotes
     });
 
     pdf.save("carousel.pdf");
