@@ -15,9 +15,10 @@ export default function Carousel({ quotes }: { quotes: string[] }) {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Set canvas size
-    canvas.width = 800;
-    canvas.height = 800;
+    // Set canvas size based on screen width
+    const canvasSize = window.innerWidth < 640 ? 300 : 800; // Smaller canvas for mobile
+    canvas.width = canvasSize;
+    canvas.height = canvasSize;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -76,10 +77,9 @@ export default function Carousel({ quotes }: { quotes: string[] }) {
   };
 
   return (
-    <div className="flex flex-col items-center">
-
+    <div className="flex flex-col items-center w-full">
       {/* Customization Options */}
-      <div className="mt-4 flex gap-4 bg-gray-100 p-4 rounded-lg m-4">
+      <div className="mt-4 flex flex-col sm:flex-row gap-4 bg-gray-100 p-4 rounded-lg m-4">
         {/* Font Style Dropdown */}
         <select
           value={fontStyle}
@@ -102,27 +102,26 @@ export default function Carousel({ quotes }: { quotes: string[] }) {
         </select>
 
         {/* Background Color Dropdown */}
-        {/* Only visible when color theme is set to "solid" */}
         {colorTheme === "solid" && (
           <select
-          value={backgroundColor}
-          onChange={(e) => setBackgroundColor(e.target.value)}
-          className="p-2 border rounded bg-white text-gray-900"
-        >
-          <option value="#4facfe">Blue</option>
-          <option value="#00f2fe">Cyan</option>
-          <option value="#1e293b">Dark Blue</option>
-          <option value="#ffffff">White</option>
-          <option value="#000000">Black</option>
-          <option value="#ff0000">Red</option>
-          <option value="#00ff00">Green</option>
-          <option value="#0000ff">Blue</option>
-        </select>
-        )}        
+            value={backgroundColor}
+            onChange={(e) => setBackgroundColor(e.target.value)}
+            className="p-2 border rounded bg-white text-gray-900"
+          >
+            <option value="#4facfe">Blue</option>
+            <option value="#00f2fe">Cyan</option>
+            <option value="#1e293b">Dark Blue</option>
+            <option value="#ffffff">White</option>
+            <option value="#000000">Black</option>
+            <option value="#ff0000">Red</option>
+            <option value="#00ff00">Green</option>
+            <option value="#0000ff">Blue</option>
+          </select>
+        )}
       </div>
 
-
-      <div className="flex items-center gap-4">
+      {/* Canvas and Navigation Buttons */}
+      <div className="flex flex-row items-center gap-4 max-w-md sm:max-w-none overflow-x-hidden">
         {/* Previous Button */}
         <button
           onClick={prevSlide}
@@ -132,7 +131,10 @@ export default function Carousel({ quotes }: { quotes: string[] }) {
         </button>
 
         {/* Canvas */}
-        <canvas ref={canvasRef} className="border shadow-lg" />
+        <canvas
+          ref={canvasRef}
+          className="border shadow-lg w-[200px] h-[200px] sm:w-[800px] sm:h-[800px] max-w-full"
+        />
 
         {/* Next Button */}
         <button
@@ -143,10 +145,8 @@ export default function Carousel({ quotes }: { quotes: string[] }) {
         </button>
       </div>
 
-
-
       {/* Download Buttons */}
-      <div className="flex gap-4 mt-4">
+      <div className="flex flex-col sm:flex-row gap-4 mt-4">
         <button
           onClick={downloadImage}
           className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
